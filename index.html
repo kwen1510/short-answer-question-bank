@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Glitch to Google Sheets</title>
+    <link
+      id="favicon"
+      rel="icon"
+      href="https://glitch.com/favicon.ico"
+      type="image/x-icon"
+    />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <h4>Glitch Google Database</h4>
+    </header>
+    <br />
+
+    <div id="questionBox"></div>
+    <br />
+
+    <label for="answerBox">Answer:</label>
+    <input type="text" id="answerBox" name="answerBox" /><br /><br />
+
+    <button onclick="updateAnswer()">Update Answer</button>
+
+    <script>
+      function shuffle(array) {
+        let currentIndex = array.length,
+          randomIndex;
+
+        // While there remain elements to shuffle.
+        while (currentIndex != 0) {
+          // Pick a remaining element.
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+
+          // And swap it with the current element.
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex],
+            array[currentIndex],
+          ];
+        }
+
+        return array;
+      }
+
+      // Global variable questions
+      var questions = [
+        { questionID: 0, question: "What is your name?" },
+        { questionID: 1, question: "What is your favourite colour?" },
+        { questionID: 2, question: "What is your happiest memory?" },
+      ];
+
+      // Global variable question number
+      var questionIndex = 0;
+
+      var reshuffledQuestions = shuffle(questions);
+      
+      var questionID = 0;
+
+      console.log(reshuffledQuestions);
+
+      // Create first question
+      createQuestion();
+
+      // Function to create question
+      function createQuestion() {
+        console.log(`Question Number: ${questionIndex + 1}`);
+
+        document.getElementById("questionBox").innerText = `Question ${
+          questionIndex + 1
+        }:`;
+
+        if (questionIndex < reshuffledQuestions.length) {
+          // Create question
+          var questionText = reshuffledQuestions[questionIndex]["question"];
+          questionID = reshuffledQuestions[questionIndex]["questionID"];
+          document.getElementById("questionBox").innerText += `\n${questionText}`
+          questionIndex += 1;
+          
+        } else {
+          alert("That's all the questions!");
+          document.getElementById("questionBox").innerText =
+            "No more questions!";
+          questionIndex = 0;
+        }
+      }
+
+      function updateAnswer() {
+        // Get submitted answer
+        var submittedAnswer = document.getElementById("answerBox").value;
+
+        console.log(`Submitted answer: ${submittedAnswer}`);
+
+        var url =
+          "https://script.google.com/macros/s/AKfycbxktOWIhoFTcDgujIlhIFNd4zkkIDYLX_4XsMJkLoBqCeYccDYyLjIVq6VCTFoLchsj/exec?";
+        url += `questionID=${questionID}&answer=${submittedAnswer}`;
+
+        console.log(url);
+
+        fetch(url) //api for the get request
+          .then(console.log("Pushed to database"));
+        console.log("Answer Updated!");
+
+        // Clear text box
+        document.getElementById("answerBox").value = "";
+
+        // Go to next question
+        createQuestion();
+      }
+    </script>
+  </body>
+</html>
